@@ -1,0 +1,63 @@
+# in operational mode
+generate wireguard keypairs named-keypair DN42-ACCESS
+generate wireguard keypairs named-keypair DN42-PEERS
+show wireguard keypairs pubkey DN42-ACCESS
+show wireguard keypairs pubkey DN42-PEERS
+
+# basic system info
+set system host-name <name>
+set system login user <username> authentication plaintext-password <password>
+
+# WAN interface
+set interfaces ethernet eth0 description "WAN"
+set interfaces ethernet eth0 address <WAN IP>/<mask>
+set protocols static route 0.0.0.0/0 next-hop <gateway>
+
+# MGMT interface
+set interfaces ethernet eth1 description "MGMT"
+set interfaces ethernet eth1 address 172.19.255.241/28
+
+# DN42
+set interfaces ethernet eth2 description "DN42-SERVICES"
+set interfaces ethernet eth2 address 172.23.119.65/28
+set interfaces ethernet eth2 address fde6:a552:874f:1c2d::1/64
+set interfaces ethernet eth2 ipv6 address eui64 fde6:a552:874f:1c2d::/64
+set interfaces wireguard wg0 description "DN42-ACCESS"
+set interfaces wireguard wg0 address 172.23.119.81/28
+set interfaces wireguard wg0 address fde6:a552:874f:9a3b::1/64
+set interfaces wireguard wg0 ipv6 address eui64 fde6:a552:874f:9a3b::/64
+set interfaces wireguard wg0 port 51820
+set interfaces wireguard wg0 private-key DN42-ACCESS
+set interfaces wireguard wg0 peer <name> pubkey <pubkey>
+set interfaces wireguard wg0 peer <name> allowed-ip 172.23.119.82/32
+set interfaces wireguard wg0 peer <name> allowed-ip fde6:a552:874f:9a3b:<id>/128
+
+set firewall source-validation disable # disable rp_filter
+set firewall state-policy invalid action accept # allow invalid states/disable conntrack
+
+# NAT
+set nat source rule 10 description "Masquerade to WAN"
+set nat source rule 10 outbound-interface eth0
+set nat source rule 10 source address 172.19.255.240/28
+set nat source rule 10 translation address masquerade
+
+# BGP
+set protocols bgp 4242421878 address-family ipv4-unicast 172.23.119.64/27
+set protocols bgp 4242421878 address-family ipv6-unicast fde6:a552:874f::/48
+
+# RPKI
+set protocols rpki cache 172.19.255.243 port 8282
+set protocols rpki cache 172.19.255.243 preference 10
+set protocols rpki cache 172.19.255.244 port 8282
+set protocols rpki cache 172.19.255.244 preference 20
+
+set policy route-map ROA rule 10 action permit
+set policy route-map ROA rule 10 match rpki valid
+set policy route-map ROA rule 20 action permit # change to deny later
+set policy route-map ROA rule 20 match rpki notfound
+set policy route-map ROA rule 30 action deny
+set policy route-map ROA rule 30 match rpki invalid
+set protocols bgp 4242421878 route-map ROA
+
+commit
+save
