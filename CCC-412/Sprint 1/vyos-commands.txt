@@ -59,5 +59,104 @@ set policy route-map ROA rule 30 action deny
 set policy route-map ROA rule 30 match rpki invalid
 set protocols bgp 4242421878 route-map ROA
 
+# IP blocks
+set firewall group network-group AS63276 description "Champlain College"
+set firewall group network-group AS63276 network 184.171.144.0/20
+set firewall group network-group AS63276 network 216.93.144.0/20
+set firewall group network-group AS4242421878 description "Champlain DN42"
+set firewall group network-group AS4242421878 network 172.23.119.64/27
+set firewall group ipv6-network-group AS4242421878_v6 description "Champlain DN42"
+set firewall group ipv6-network-group AS4242421878_v6 network fde6:a552:874f::/48
+
+
+# Firewall
+set firewall name ALLOW default-action accept
+set firewall name DENY default-action drop
+set firewall name DENY rule 1 description "Accept established/related"
+set firewall name DENY rule 1 action accept
+set firewall name DENY rule 1 state established enable
+set firewall name DENY rule 1 state related enable
+set firewall name MGMT_LOCAL default-action drop
+set firewall name MGMT_LOCAL rule 1 description "Accept established/related"
+set firewall name MGMT_LOCAL rule 1 action accept
+set firewall name MGMT_LOCAL rule 1 state established enable
+set firewall name MGMT_LOCAL rule 1 state related enable
+set firewall name MGMT_LOCAL rule 2 description "Accept ICMP"
+set firewall name MGMT_LOCAL rule 2 action accept
+set firewall name MGMT_LOCAL rule 2 protocol icmp
+set firewall name MGMT_LOCAL rule 10 description "Accept SSH"
+set firewall name MGMT_LOCAL rule 10 action accept
+set firewall name MGMT_LOCAL rule 10 protocol tcp
+set firewall name MGMT_LOCAL rule 10 destination port ssh
+set firewall name MGMT_WAN default-action accept
+set firewall name MGMT_WAN rule 10 description "Drop Champlain network"
+set firewall name MGMT_WAN rule 10 action drop
+set firewall name MGMT_WAN rule 10 destination group network-group AS63276
+set firewall name MGMT_DN42 default-action drop
+set firewall name MGMT_DN42 rule 10 description "Accept to AS4242421878"
+set firewall name MGMT_DN42 rule 10 action accept
+set firewall name MGMT_DN42 rule 10 destination group network-group AS4242421878
+set firewall name DN42_LOCAL default-action drop
+set firewall name DN42_LOCAL rule 1 description "Accept established/related"
+set firewall name DN42_LOCAL rule 1 action accept
+set firewall name DN42_LOCAL rule 1 state established enable
+set firewall name DN42_LOCAL rule 1 state related enable
+set firewall name DN42_LOCAL rule 2 description "Accept ICMP"
+set firewall name DN42_LOCAL rule 2 action accept
+set firewall name DN42_LOCAL rule 2 protocol icmp
+set firewall name DN42_LOCAL rule 10 description "Accept BGP"
+set firewall name DN42_LOCAL rule 10 action accept
+set firewall name DN42_LOCAL rule 10 protocol tcp
+set firewall name DN42_LOCAL rule 10 destination port bgp
+set firewall name WAN_LOCAL default-action drop
+set firewall name WAN_LOCAL rule 1 description "Accept established/related"
+set firewall name WAN_LOCAL rule 1 action accept
+set firewall name WAN_LOCAL rule 1 state established enable
+set firewall name WAN_LOCAL rule 1 state related enable
+set firewall name WAN_LOCAL rule 2 description "Accept ICMP"
+set firewall name WAN_LOCAL rule 2 action accept
+set firewall name WAN_LOCAL rule 2 protocol icmp
+set firewall name WAN_LOCAL rule 10 description "Accept Wireguard"
+set firewall name WAN_LOCAL rule 10 action accept
+set firewall name WAN_LOCAL rule 10 protocol udp
+set firewall name WAN_LOCAL rule 10 destination port 51820
+set firewall name WAN_LOCAL rule 20 description "Accept Wireguard Peers"
+set firewall name WAN_LOCAL rule 20 action accept
+set firewall name WAN_LOCAL rule 20 protocol udp
+set firewall name WAN_LOCAL rule 20 source port 20000-23999
+set firewall name WAN_LOCAL rule 30 description "Accept GRE"
+set firewall name WAN_LOCAL rule 30 action accept
+set firewall name WAN_LOCAL rule 30 protocol gre
+set firewall ipv6-name DN42_LOCAL_v6 default-action drop
+set firewall ipv6-name DN42_LOCAL_v6 rule 1 description "Accept established/related"
+set firewall ipv6-name DN42_LOCAL_v6 rule 1 action accept
+set firewall ipv6-name DN42_LOCAL_v6 rule 1 state established enable
+set firewall ipv6-name DN42_LOCAL_v6 rule 1 state related enable
+set firewall ipv6-name DN42_LOCAL_v6 rule 2 description "Accept ICMPv6"
+set firewall ipv6-name DN42_LOCAL_v6 rule 2 action accept
+set firewall ipv6-name DN42_LOCAL_v6 rule 2 protocol icmpv6
+set firewall ipv6-name DN42_LOCAL_v6 rule 10 description "Accept BGP"
+set firewall ipv6-name DN42_LOCAL_v6 rule 10 action accept
+set firewall ipv6-name DN42_LOCAL_v6 rule 10 protocol tcp
+set firewall ipv6-name DN42_LOCAL_v6 rule 10 destination port bgp
+
+# Zones
+set zone-policy zone WAN interface eth0
+set zone-policy zone WAN from MGMT firewall name MGMT_WAN
+set zone-policy zone WAN from LOCAL firewall name ALLOW
+set zone-policy zone LOCAL local-zone
+set zone-policy zone LOCAL from MGMT firewall name MGMT_LOCAL
+set zone-policy zone LOCAL from DN42 firewall name DN42_LOCAL
+set zone-policy zone LOCAL from DN42 firewall ipv6-name DN42_LOCAL_v6
+set zone-policy zone LOCAL from WAN firewall name WAN_LOCAL
+set zone-policy zone MGMT interface eth1
+set zone-policy zone MGMT from WAN firewall name DENY
+set zone-policy zone MGMT from LOCAL firewall name ALLOW
+set zone-policy zone MGMT from DN42 firewall name DENY
+set zone-policy zone DN42 interface eth2
+set zone-policy zone DN42 interface wg*
+set zone-policy zone DN42 from LOCAL firewall name ALLOW
+set zone-policy zone DN42 from MGMT firewall name MGMT_DN42
+
 commit
 save
