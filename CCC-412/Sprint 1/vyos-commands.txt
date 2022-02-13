@@ -31,6 +31,7 @@ set interfaces wireguard wg0 private-key DN42-ACCESS
 set interfaces wireguard wg0 peer <name> pubkey <pubkey>
 set interfaces wireguard wg0 peer <name> allowed-ip 172.23.119.82/32
 set interfaces wireguard wg0 peer <name> allowed-ip fde6:a552:874f:9a3b:<id>/128
+set service router-advert interface eth2 prefix fde6:a552:874f:1c2d::/64
 
 set firewall source-validation disable # disable rp_filter
 set firewall state-policy invalid action accept # allow invalid states/disable conntrack
