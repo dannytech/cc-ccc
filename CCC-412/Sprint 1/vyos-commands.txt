@@ -127,6 +127,7 @@ set firewall name WAN_LOCAL rule 20 source port 20000-23999
 set firewall name WAN_LOCAL rule 30 description "Accept GRE"
 set firewall name WAN_LOCAL rule 30 action accept
 set firewall name WAN_LOCAL rule 30 protocol gre
+set firewall ipv6-name ALLOW default-action accept
 set firewall ipv6-name DN42_LOCAL_v6 default-action drop
 set firewall ipv6-name DN42_LOCAL_v6 rule 1 description "Accept established/related"
 set firewall ipv6-name DN42_LOCAL_v6 rule 1 action accept
@@ -156,6 +157,7 @@ set zone-policy zone MGMT from DN42 firewall name DENY
 set zone-policy zone DN42 interface eth2
 set zone-policy zone DN42 interface wg*
 set zone-policy zone DN42 from LOCAL firewall name ALLOW
+set zone-policy zone DN42 from LOCAL firewall ipv6-name ALLOW_v6
 set zone-policy zone DN42 from MGMT firewall name MGMT_DN42
 
 commit
