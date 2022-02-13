@@ -7,6 +7,8 @@ show wireguard keypairs pubkey DN42-PEERS
 # basic system info
 set system host-name <name>
 set system login user <username> authentication plaintext-password <password>
+set system login user <username> authentication public-key "<username>@mgmt" type ssh-ed25519
+set system login user <username> authentication public-key "<username>@mgmt" key "..."
 
 # WAN interface
 set interfaces ethernet eth0 description "WAN"
@@ -16,6 +18,8 @@ set protocols static route 0.0.0.0/0 next-hop <gateway>
 # MGMT interface
 set interfaces ethernet eth1 description "MGMT"
 set interfaces ethernet eth1 address 172.19.255.241/28
+set service ssh listen-address 172.19.255.241
+set service ssh disable-password-authentication
 
 # DN42
 set interfaces ethernet eth2 description "DN42-SERVICES"
