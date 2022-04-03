@@ -1,0 +1,5 @@
+# dnscontrol secrets file
+creds.json
+
+# generated zone files
+*.zone
