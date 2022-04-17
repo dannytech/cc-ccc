@@ -4,9 +4,13 @@ D("champlain.dn42!forward", REG_NONE, DnsProvider(DNS_BIND),
 
     // primary nameserver
     A("ns-1", "172.23.119.66"),
-    AAAA("ns-1", "fde6:a552:874f:1c2d:60c7:a0ff:fecd:b5b"),
+    AAAA("ns-1", "fde6:a552:874f:53::1"),
 
     // secondary nameserver
     A("ns-2", "172.23.119.67"),
-    AAAA("ns-2", "fde6:a552:874f:1c2d:48b2:90ff:fe68:91df")
+    AAAA("ns-2", "fde6:a552:874f:53::2"),
+
+    // looking glass
+    A("lg", "172.23.119.78"),
+    AAAA("lg", "fde6:a552:874f:1c2d:dc77:2aff:feb5:73")
 )
