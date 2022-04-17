@@ -96,6 +96,10 @@ set firewall name MGMT_LOCAL rule 10 description "Accept SSH"
 set firewall name MGMT_LOCAL rule 10 action accept
 set firewall name MGMT_LOCAL rule 10 protocol tcp
 set firewall name MGMT_LOCAL rule 10 destination port ssh
+set firewall name MGMT_LOCAL rule 20 description "Accept Wireguard"
+set firewall name MGMT_LOCAL rule 20 action accept
+set firewall name MGMT_LOCAL rule 20 protocol udp
+set firewall name MGMT_LOCAL rule 20 destination port 51820
 set firewall name MGMT_WAN default-action accept
 set firewall name MGMT_WAN rule 10 description "Drop Champlain network"
 set firewall name MGMT_WAN rule 10 action drop
