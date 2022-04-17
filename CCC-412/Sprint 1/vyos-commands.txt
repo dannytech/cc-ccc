@@ -21,6 +21,7 @@ set protocols static route 0.0.0.0/0 next-hop 216.93.159.14
 set interfaces ethernet eth1 description "MGMT"
 set interfaces ethernet eth1 address 172.19.255.241/28
 set service ssh listen-address 172.19.255.241
+set service ssh listen-address 172.23.119.65
 set service ssh disable-password-authentication
 
 # DN42
@@ -115,6 +116,11 @@ set firewall name DN42_LOCAL rule 10 description "Accept BGP"
 set firewall name DN42_LOCAL rule 10 action accept
 set firewall name DN42_LOCAL rule 10 protocol tcp
 set firewall name DN42_LOCAL rule 10 destination port bgp
+set firewall name DN42_LOCAL rule 20 description "Accept Looking Glass SSH"
+set firewall name DN42_LOCAL rule 20 action accept
+set firewall name DN42_LOCAL rule 20 destination port ssh
+set firewall name DN42_LOCAL rule 20 protocol tcp
+set firewall name DN42_LOCAL rule 20 source address 172.23.119.78
 set firewall name WAN_LOCAL default-action drop
 set firewall name WAN_LOCAL rule 1 description "Accept established/related"
 set firewall name WAN_LOCAL rule 1 action accept
