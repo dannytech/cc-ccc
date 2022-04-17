@@ -23,6 +23,17 @@ set interfaces ethernet eth1 address 172.19.255.241/28
 set service ssh listen-address 172.19.255.241
 set service ssh listen-address 172.23.119.65
 set service ssh disable-password-authentication
+set service dns forwarding allow-from 172.19.255.240/28
+set service dns forwarding listen-address 172.19.255.241
+set service dns forwarding name-server 1.1.1.1
+set service dns forwarding name-server 1.0.0.1
+set service dns forwarding domain champlain.dn42 server 172.23.119.66
+set service dns forwarding domain champlain.dn42 server 172.23.119.67
+set service dns forwarding domain 64_27.119.23.172.in-addr.arpa server 172.23.119.66
+set service dns forwarding domain 64_27.119.23.172.in-addr.arpa server 172.23.119.67
+set service dns forwarding domain f.4.7.8.2.5.5.a.6.e.d.f.ip6.arpa server 172.23.119.66
+set service dns forwarding domain f.4.7.8.2.5.5.a.6.e.d.f.ip6.arpa server 172.23.119.67
+set service dns forwarding no-serve-rfc1918
 
 # DN42
 set interfaces ethernet eth2 description "DN42-SERVICES"
@@ -96,10 +107,14 @@ set firewall name MGMT_LOCAL rule 10 description "Accept SSH"
 set firewall name MGMT_LOCAL rule 10 action accept
 set firewall name MGMT_LOCAL rule 10 protocol tcp
 set firewall name MGMT_LOCAL rule 10 destination port ssh
-set firewall name MGMT_LOCAL rule 20 description "Accept Wireguard"
+set firewall name MGMT_LOCAL rule 20 description "Accept DNS"
 set firewall name MGMT_LOCAL rule 20 action accept
 set firewall name MGMT_LOCAL rule 20 protocol udp
-set firewall name MGMT_LOCAL rule 20 destination port 51820
+set firewall name MGMT_LOCAL rule 20 destination port domain
+set firewall name MGMT_LOCAL rule 30 description "Accept Wireguard"
+set firewall name MGMT_LOCAL rule 30 action accept
+set firewall name MGMT_LOCAL rule 30 protocol udp
+set firewall name MGMT_LOCAL rule 30 destination port 51820
 set firewall name MGMT_WAN default-action accept
 set firewall name MGMT_WAN rule 10 description "Drop Champlain network"
 set firewall name MGMT_WAN rule 10 action drop
