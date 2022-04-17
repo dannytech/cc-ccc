@@ -1,14 +1,16 @@
 # in operational mode
-generate wireguard keypairs named-keypair DN42-ACCESS
-generate wireguard keypairs named-keypair DN42-PEERS
+generate wireguard named-keypair DN42-ACCESS
+generate wireguard named-keypair DN42-PEERS
 show wireguard keypairs pubkey DN42-ACCESS
 show wireguard keypairs pubkey DN42-PEERS
 
+configure
+
 # basic system info
-set system host-name <name>
-set system login user <username> authentication plaintext-password <password>
-set system login user <username> authentication public-key "<username>@mgmt" type ssh-ed25519
-set system login user <username> authentication public-key "<username>@mgmt" key "..."
+set system host-name fw-1
+set system login user vyos authentication plaintext-password <password>
+set system login user vyos authentication public-key "<username>@mgmt" type ssh-ed25519
+set system login user vyos authentication public-key "<username>@mgmt" key "..."
 
 # WAN interface
 set interfaces ethernet eth0 description "WAN"
@@ -38,7 +40,7 @@ set interfaces wireguard wg0 peer <name> allowed-ip fde6:a552:874f:9a3b:<id>/128
 set service router-advert interface eth2 prefix fde6:a552:874f:1c2d::/64
 
 set firewall source-validation disable # disable rp_filter
-set firewall state-policy invalid action accept # allow invalid states/disable conntrack
+#set firewall state-policy invalid action accept # allow invalid states/disable conntrack
 
 # NAT
 set nat source rule 10 description "Masquerade to WAN"
@@ -47,8 +49,8 @@ set nat source rule 10 source address 172.19.255.240/28
 set nat source rule 10 translation address masquerade
 
 # BGP
-set protocols bgp 4242421878 address-family ipv4-unicast 172.23.119.64/27
-set protocols bgp 4242421878 address-family ipv6-unicast fde6:a552:874f::/48
+set protocols bgp 4242421878 address-family ipv4-unicast network 172.23.119.64/27
+set protocols bgp 4242421878 address-family ipv6-unicast network fde6:a552:874f::/48
 
 # RPKI
 set protocols rpki cache 172.19.255.243 port 8282
@@ -132,7 +134,7 @@ set firewall name WAN_LOCAL rule 20 source port 20000-23999
 set firewall name WAN_LOCAL rule 30 description "Accept GRE"
 set firewall name WAN_LOCAL rule 30 action accept
 set firewall name WAN_LOCAL rule 30 protocol gre
-set firewall ipv6-name ALLOW default-action accept
+set firewall ipv6-name ALLOW_v6 default-action accept
 set firewall ipv6-name DN42_LOCAL_v6 default-action drop
 set firewall ipv6-name DN42_LOCAL_v6 rule 1 description "Accept established/related"
 set firewall ipv6-name DN42_LOCAL_v6 rule 1 action accept
