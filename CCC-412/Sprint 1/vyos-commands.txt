@@ -14,8 +14,8 @@ set system login user vyos authentication public-key "<username>@mgmt" key "..."
 
 # WAN interface
 set interfaces ethernet eth0 description "WAN"
-set interfaces ethernet eth0 address <WAN IP>/<mask>
-set protocols static route 0.0.0.0/0 next-hop <gateway>
+set interfaces ethernet eth0 address 216.93.159.11/29
+set protocols static route 0.0.0.0/0 next-hop 216.93.159.14
 
 # MGMT interface
 set interfaces ethernet eth1 description "MGMT"
